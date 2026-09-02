@@ -1,0 +1,657 @@
+import tkinter as tk
+from tkinter import font as tkfont
+from datetime import datetime
+
+KNOWLEDGE_BASE = [
+    {"topic": "Greeting", "keywords": ["hi", "hello", "hey", "greetings", "good morning", "good evening"],
+     "response": "Hello! I'm the College Admission Assistant. You can ask me about fees, eligibility, courses, hostel, documents, scholarships, deadlines, or contact info."},
+    {"topic": "Fees", "keywords": ["fee", "fees", "cost", "tuition", "payment", "charges", "price"],
+     "response": "The annual tuition fee varies by course, typically between INR 60,000 - 1,50,000 per year. Hostel and exam fees are separate. Contact the accounts office for the exact fee structure."},
+    {"topic": "Eligibility", "keywords": ["eligibility", "eligible", "criteria", "qualify", "marks required", "percentage required", "cutoff"],
+     "response": "Eligibility generally requires 50% or above in 10+2 (relevant stream) for UG courses, and a recognized bachelor's degree with 50% for PG courses. Specific programs may have additional entrance exam requirements."},
+    {"topic": "Courses", "keywords": ["course", "courses", "program", "programs", "branches", "streams", "specialization"],
+     "response": "We offer UG and PG programs in Computer Science, IT, Data Science, Electronics, Mechanical, and Business Administration. Visit the 'Programs' page on the college website for the full list."},
+    {"topic": "Admission Process", "keywords": ["admission", "apply", "application", "process", "how to join", "enrol", "enroll", "registration"],
+     "response": "Admissions open online via the college portal. Steps: 1) Fill the application form 2) Upload documents 3) Pay application fee 4) Attend counselling/entrance exam (if applicable)  5) Confirm seat."},
+    {"topic": "Documents", "keywords": ["document", "documents", "certificate", "certificates", "id proof", "marksheet"],
+     "response": "Required documents: 10th & 12th marksheets, transfer certificate, migration certificate, passport-size photos, ID proof (Aadhar/Passport), and category certificate (if applicable)."},
+    {"topic": "Hostel", "keywords": ["hostel", "accommodation", "room", "stay", "housing"],
+     "response": "Hostel accommodation is available for both boys and girls on a first-come-first-serve basis. Rooms are shared (2-3 students), with mess facilities included in the hostel fee."},
+    {"topic": "Scholarship", "keywords": ["scholarship", "scholarships", "financial aid", "concession"],
+     "response": "Merit and need-based scholarships are available, covering 10%-100% of tuition fees based on academic performance and family income. Apply separately through the scholarship cell after admission."},
+    {"topic": "Deadlines", "keywords": ["deadline", "last date", "closing date", "when does admission", "important dates"],
+     "response": "Admissions typically open in May and close by mid-July, subject to seat availability. Check the official notice board / website for the exact academic-year dates."},
+    {"topic": "Contact", "keywords": ["contact", "phone", "email", "reach", "office"],
+     "response": "You can reach the Admission Office at admissions@college.edu or call +91-XXXXXXXXXX (Mon-Sat, 10 AM - 5 PM)."},
+    {"topic": "Location", "keywords": ["location", "address", "where is the college", "campus location", "how to reach college"],
+     "response": "The college is located at XYZ Road, City, State - PIN code. It's well connected by bus and metro/rail."},
+    {"topic": "Placements", "keywords": ["placement", "placements", "job", "jobs", "recruitment", "package", "salary offered"],
+     "response": "The college has an active placement cell with recruiters visiting every year. Average packages vary by branch; top recruiters include several IT and core companies."},
+    {"topic": "Faculty", "keywords": ["faculty", "professors", "teachers", "staff qualification", "teaching staff"],
+     "response": "The college has qualified faculty with postgraduate and doctoral degrees, along with industry experience in their respective fields."},
+    {"topic": "Campus Facilities", "keywords": ["campus facilities", "campus facility", "facility", "facilities", "campus infrastructure", "infrastructure", "labs", "laboratory", "classrooms", "seminar hall", "cafeteria", "medical room"],
+     "response": "Campus facilities include well-equipped labs, seminar halls, a cafeteria, Wi-Fi enabled classrooms, and a medical room."},
+    {"topic": "Library", "keywords": ["library", "books", "reading room", "e-books", "journals"],
+     "response": "The central library has a large collection of books, journals, and e-resources, along with a dedicated reading room open on all working days."},
+    {"topic": "Transport", "keywords": ["transport", "bus", "bus facility", "commute", "college bus"],
+     "response": "Bus transport facility is available on multiple routes across the city for an additional annual fee. Route details are shared after admission."},
+    {"topic": "Exam Pattern", "keywords": ["exam pattern", "examination", "internal exam", "external exam", "exam scheme"],
+     "response": "Exams follow a semester pattern with internal assessments (tests, assignments) and external semester-end written examinations."},
+    {"topic": "Semester System", "keywords": ["semester", "semesters", "credit system", "credits"],
+     "response": "The course follows a semester-wise, credit-based system, typically with 2 semesters per academic year."},
+    {"topic": "Attendance", "keywords": ["attendance", "minimum attendance", "attendance criteria", "attendance requirement"],
+     "response": "A minimum of 75% attendance is generally required to be eligible to sit for semester-end examinations."},
+    {"topic": "Internship", "keywords": ["internship", "internships", "industrial training", "training program"],
+     "response": "Internships are encouraged and for several programs, mandatory in the final year. The training & placement cell assists in arranging them."},
+    {"topic": "Entrance Exam", "keywords": ["entrance exam", "entrance test", "cet", "qualifying exam"],
+     "response": "Depending on the program, admission may require qualifying an entrance exam such as the state CET."},
+    {"topic": "Merit List", "keywords": ["merit list", "rank list", "selection list", "result of admission"],
+     "response": "The merit list is published on the official website based on qualifying marks/entrance exam scores, followed by document verification."},
+    {"topic": "Counselling", "keywords": ["counselling", "counseling", "seat allotment", "choice filling"],
+     "response": "Centralized counselling involves choice filling, seat allotment rounds, and reporting to the allotted college within the given deadline."},
+    {"topic": "Refund Policy", "keywords": ["refund", "cancellation", "withdraw admission", "cancel admission"],
+     "response": "Fee refunds after cancellation follow the regulatory body's refund schedule : the earlier you withdraw, the higher the refund percentage."},
+    {"topic": "WiFi", "keywords": ["wifi", "wi-fi", "internet", "internet facility"],
+     "response": "Campus-wide Wi-Fi is available for students in classrooms, library, and common areas."},
+    {"topic": "Lateral Entry", "keywords": ["lateral entry", "direct second year", "diploma entry"],
+     "response": "Diploma holders can seek admission directly into the second year of the degree program through lateral entry, subject to seat availability."},
+    {"topic": "ID Card", "keywords": ["id card", "student id", "identity card"],
+     "response": "Student ID cards are issued within the first few weeks of the semester after admission formalities are completed."},
+    {"topic": "Sports", "keywords": ["sports", "sports facility", "sports facilities", "sports complex", "playground", "games", "gym", "tournament"],
+     "response": "The college offers sports facilities including a playground, indoor games room, and gymnasium, along with inter-college tournaments."},
+    {"topic": "Alumni", "keywords": ["alumni", "alumni network", "past students"],
+     "response": "The college maintains an active alumni network that supports current students through mentorship, guest talks, and referrals."},
+    {"topic": "Thanks", "keywords": ["thanks", "thank you", "thx", "thnx", "tahnku", "appreciate"],
+     "response": "You're welcome! Feel free to ask if you have more questions about admissions."},
+    {"topic": "Bye", "keywords": ["bye", "goodbye", "see you", "exit", "quit"],
+     "response": "Goodbye! All the best with your admission process."},
+]
+
+DEFAULT_RESPONSE = ("Sorry, I couldn't find information on that. Try asking about "
+                     "fees, eligibility, courses, admission process, documents, "
+                     "hostel, scholarships, deadlines, or contact details.")
+
+FOLLOWUPS = {
+    "Greeting": ["what courses are available?", "What are the fees?", "What is the admission process?"],
+    "Fees": ["Are scholarships available?", "What are the hostel fees?", "What is the refund policy?"],
+    "Eligibility": ["Is there an entrance exam?", "What documents are required?", "What is the admission process?", "How do I apply?"],
+    "Courses": ["What are the fees?", "Tell me about placements"],
+    "Admission Process": ["What documents are required?", "What is the last date?"],
+    "Documents": ["What is the admission process?", "How do I get my ID card?"],
+    "Hostel": [ "Is transport facility available?"],
+    "Scholarship": ["What is the eligibility criteria?", "What are the fees?", "How do I apply for a scholarship?"],
+    "Deadlines": ["How do I apply?", "What documents are needed?", "What is the admission process?"],
+    "Contact": ["What are the office timings?", "Where is the college located?"],
+    "Location": ["Is transport facility available?", "What is the contact number?"],
+    "Placements": ["Tell me about internships", "What is the average package?"],
+    "Faculty": ["Tell me about campus facilities", "Is there a library?", "Are sports facilities available?"],
+    "Campus Facilities": ["Tell me about the library", "Is WiFi available?"],
+    "Library": ["Is Wi-Fi available?", "Tell me about campus facilities"],
+    "Transport": ["Where is the college located?"],
+    "Exam Pattern": ["What is the semester system?", "Minimum attendance required?"],
+    "Semester System": ["What is the exam pattern?"],
+    "Attendance": ["What is the exam pattern?"],
+    "Internship": ["Tell me about placements", "Are internships mandatory?"],
+    "Entrance Exam": ["What is the merit list process?", "What is the eligibility?"],
+    "Merit List": ["When is the merit list released?", "What is the counselling process?"],
+    "Counselling": ["What is the merit list process?"],
+    "Refund Policy": ["What are the fees?"],
+    "WiFi": ["Tell me about campus facilities"],
+    "Lateral Entry": ["What is the eligibility criteria?"],
+    "ID Card": ["What documents are required?"],
+    "Sports": ["Tell me about campus facilities"],
+    "Alumni": ["Tell me about placements"],
+    "Thanks": ["What courses are available?", "What are the fees?", "What is the admission process?"],
+    "Unmatched": ["What are the fees?", "What is the admission process?", "Tell me about courses"],
+}
+
+def infer_response(user_input, kb=KNOWLEDGE_BASE):
+    text = user_input.lower()
+    scored = [
+        (rule, sum(len(kw) for kw in rule["keywords"] if kw in text),
+         [kw for kw in rule["keywords"] if kw in text])
+        for rule in kb
+    ]
+    best_rule, best_score, best_matches = max(scored, key=lambda item: item[1])
+    if best_score == 0:
+        return DEFAULT_RESPONSE, "Unmatched", []
+    return best_rule["response"], best_rule["topic"], best_matches
+
+#UI  
+HEADER_L, HEADER_R = "#7C4558", "#925F70"
+CHAT_TOP, CHAT_BOTTOM = "#2B2227", "#38282F"
+BUBBLE_USER = "#A7657D"
+BUBBLE_BOT = "#403139"
+BUBBLE_BOT_BORDER = "#604852"
+TEXT_USER = "#FFFFFF"
+TEXT_BOT = "#F3E8ED"
+NAME_COLOR = "#C19CA9"
+TIME_COLOR = "#A58A96"
+CHIP_FILL = "#4C3841"
+CHIP_BORDER = "#6B4E5B"
+CHIP_TEXT = "#E5D4DB"
+INPUT_BAR_BG = "#261F23"
+INPUT_BOX_BG = "#382C32"
+INPUT_TEXT = "#F4E9ED"
+
+class ChatbotUI:
+    def __init__(self, root):
+        self.root = root
+        root.title("College Admission Assistant")
+        root.geometry("460x680")
+        root.minsize(380, 480)
+        root.configure(bg="#F1EEF7")
+
+        self.bubble_font = tkfont.Font(family="Segoe UI", size=10)
+        self.name_font = tkfont.Font(family="Segoe UI", size=8, weight="bold")
+        self.time_font = tkfont.Font(family="Segoe UI", size=7)
+        self.chip_font = tkfont.Font(family="Segoe UI", size=8)
+
+        self.card_bg = "#FFFFFF"
+        self.border_color = "#D8D2E4"
+        self.shadow_color = "#DAD4E8"
+
+        self.side_margin = 18
+        self.max_bubble_width = 300
+        self.message_gap = 7
+        self.name_gap = 3
+        self.time_gap = 2
+
+        self.messages = []
+        self.next_y = 18
+        self.canvas_w = 550
+
+        self.build_card()
+        self.build_header()
+        self.build_chat_area()
+        self.build_input_bar()
+
+        self.add_message(
+            "Hello! I'm your College Admission Assistant. Ask me anything about "
+            "admissions, fees, eligibility, courses, hostel, placements, or documents.",
+            "bot",
+            "Greeting"
+        )
+
+    # card
+    def build_card(self):
+        self.card = tk.Frame(
+            self.root,
+            bg=self.card_bg,
+            highlightthickness=1,
+            highlightbackground=self.border_color,
+            highlightcolor=self.border_color,
+            bd=0
+        )
+        self.card.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center",
+            width=430,
+            height=650
+        )
+        self.root.bind("<Configure>", self.resize_card)
+    def resize_card(self, event=None):
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        if width <= 1 or height <= 1:
+            return
+        card_width = max(350, min(640, width - 36))
+        card_height = max(430, min(760, height - 36))
+        self.card.place_configure(
+            width=card_width,
+            height=card_height
+        )
+    # header
+    def build_header(self):
+        self.header = tk.Canvas(
+            self.card,
+            height=68,
+            highlightthickness=0,
+            bd=0
+        )
+        self.header.pack(
+            fill=tk.X,
+            side=tk.TOP
+        )
+        self.header.bind(
+            "<Configure>",
+            self.draw_header
+        )
+    def draw_header(self, event=None):
+        width = self.header.winfo_width() or 430
+        self.header.delete("all")
+        self.header.create_rectangle(
+            0, 0, width, 68,
+            fill=HEADER_L,
+            outline=HEADER_L,
+            tags="hgrad"
+        )
+        self.header.create_text(
+            18,
+            24,
+            text="🎓",
+            fill="white",
+            font=("Segoe UI Emoji", 15),
+            anchor="w"
+        )
+        self.header.create_text(
+            48,
+            20,
+            text="Admission Assistant",
+            fill="white",
+            font=("Segoe UI", 13, "bold"),
+            anchor="w"
+        )
+        self.header.create_text(
+            48,
+            43,
+            text="College admission support",
+            fill="#DDD8EE",
+            font=("Segoe UI", 8),
+            anchor="w"
+        )
+    # chat area
+    def build_chat_area(self):
+        outer = tk.Frame(
+            self.card,
+            bg=self.card_bg
+        )
+        outer.pack(
+            fill=tk.BOTH,
+            expand=True
+        )
+        self.canvas = tk.Canvas(
+            outer,
+            bg=self.card_bg,
+            highlightthickness=0,
+            bd=0
+        )
+        scrollbar = tk.Scrollbar(
+            outer,
+            orient="vertical",
+            command=self.canvas.yview,
+            width=5,
+            bg="#D8D3E2",
+            troughcolor=self.card_bg,
+            activebackground="#BDB6CB",
+            bd=0,
+            relief=tk.FLAT
+        )
+        self.canvas.configure(
+            yscrollcommand=scrollbar.set
+        )
+        scrollbar.pack(
+            side=tk.RIGHT,
+            fill=tk.Y,
+            padx=(0, 3),
+            pady=5
+        )
+        self.canvas.pack(
+            side=tk.LEFT,
+            fill=tk.BOTH,
+            expand=True
+        )
+        self.canvas.bind(
+            "<Configure>",
+            self.canvas_resize
+        )
+        self.canvas.bind_all(
+            "<MouseWheel>",
+            lambda event: self.canvas.yview_scroll(
+                int(-event.delta / 120),
+                "units"
+            )
+        )
+    def canvas_resize(self, event=None):
+        width = self.canvas.winfo_width()
+        if width > 1 and abs(width - self.canvas_w) > 2:
+            self.canvas_w = width
+            self.redraw_messages()
+    # input bar
+    def build_input_bar(self):
+        bar = tk.Frame(
+            self.card,
+            bg=self.card_bg,
+            height=64
+        )
+        bar.pack(
+            fill=tk.X,
+            side=tk.BOTTOM
+        )
+        bar.pack_propagate(False)
+        container = tk.Frame(
+            bar,
+            bg=self.card_bg
+        )
+        container.pack(
+            fill=tk.BOTH,
+            expand=True,
+            padx=12,
+            pady=9
+        )
+        self.entry_frame = tk.Frame(
+            container,
+            bg=INPUT_BOX_BG,
+            highlightthickness=1,
+            highlightbackground="#DDD8E6",
+            highlightcolor="#C9C1D8"
+        )
+        self.entry_frame.pack(
+            fill=tk.BOTH,
+            expand=True
+        )
+        self.entry = tk.Entry(
+            self.entry_frame,
+            font=("Segoe UI", 10),
+            relief=tk.FLAT,
+            bg=INPUT_BOX_BG,
+            fg=INPUT_TEXT,
+            insertbackground=INPUT_TEXT,
+            highlightthickness=0,
+            bd=0
+        )
+        self.entry.pack(
+            side=tk.LEFT,
+            fill=tk.BOTH,
+            expand=True,
+            padx=(12, 4),
+            pady=3
+        )
+        self.entry.bind(
+            "<Return>",
+            lambda event: self.handle_send()
+        )
+        self.entry.focus_set()
+        self.send_button = tk.Button(
+            self.entry_frame,
+            text="➤",
+            font=("Segoe UI", 11, "bold"),
+            bg=BUBBLE_USER,
+            fg="white",
+            activebackground=BUBBLE_USER,
+            activeforeground="white",
+            relief=tk.FLAT,
+            bd=0,
+            highlightthickness=0,
+            cursor="hand2",
+            command=self.handle_send
+        )
+        self.send_button.pack(
+            side=tk.RIGHT,
+            padx=4,
+            pady=4,
+            ipadx=7,
+            ipady=2
+        )
+        self.send_button.bind(
+            "<Enter>",
+            lambda event: self.send_button.configure(bg="#7165B5")
+        )
+        self.send_button.bind(
+            "<Leave>",
+            lambda event: self.send_button.configure(bg=BUBBLE_USER)
+        )
+    # chat layout
+    def get_chat_area(self):
+        chat_width = min(self.canvas_w, 550)
+        chat_left = (self.canvas_w - chat_width) / 2
+        return (
+            chat_left,
+            chat_left + chat_width,
+            chat_width
+        )
+    # messages
+    def add_message(self, text, sender, topic):
+        self.messages.append(
+            (text, sender, topic, datetime.now().strftime("%H:%M"))
+        )
+        self.redraw_messages()
+    def redraw_messages(self):
+        self.canvas.delete("bubble", "chip")
+        self.next_y = 18
+        for index, message in enumerate(self.messages):
+            text, sender, topic, message_time = message
+            show_chips = (
+                index == len(self.messages) - 1
+                and sender == "bot"
+            )
+            self.draw_message(
+                text,
+                sender,
+                topic,
+                show_chips,
+                message_time
+            )
+        self.update_scroll()
+    def draw_message(self, text, sender, topic, show_chips=False, message_time=None):
+        is_user = sender == "user"
+        chat_left, chat_right, chat_width = self.get_chat_area()
+        max_width = min(
+            self.max_bubble_width,
+            max(210, chat_width - 70)
+        )
+        if is_user:
+            name_x = chat_right - self.side_margin
+            name_anchor = "ne"
+            name = "You"
+        else:
+            name_x = chat_left + self.side_margin
+            name_anchor = "nw"
+            name = "Assistant"
+        self.canvas.create_text(
+            name_x,
+            self.next_y,
+            text=name,
+            fill=NAME_COLOR,
+            font=self.name_font,
+            anchor=name_anchor,
+            tags="bubble"
+        )
+        self.next_y += 14 + self.name_gap
+        temp = self.canvas.create_text(
+            0,
+            0,
+            text=text,
+            font=self.bubble_font,
+            width=max_width,
+            anchor="nw"
+        )
+        box = self.canvas.bbox(temp)
+        self.canvas.delete(temp)
+        if box:
+            text_width = box[2] - box[0]
+            text_height = box[3] - box[1]
+        else:
+            text_width = 100
+            text_height = 20
+        bubble_width = min(
+            text_width + 28,
+            max_width + 28
+        )
+        bubble_height = text_height + 20
+        if is_user:
+            bubble_x1 = chat_right - self.side_margin
+            bubble_x0 = bubble_x1 - bubble_width
+        else:
+            bubble_x0 = chat_left + self.side_margin
+            bubble_x1 = bubble_x0 + bubble_width
+        bubble_y0 = self.next_y
+        bubble_y1 = self.next_y + bubble_height
+        fill = BUBBLE_USER if is_user else BUBBLE_BOT
+        outline = fill if is_user else BUBBLE_BOT_BORDER
+        text_color = TEXT_USER if is_user else TEXT_BOT
+
+        self.canvas.create_rectangle(
+            bubble_x0 + 2, bubble_y0 + 3,
+            bubble_x1 + 2, bubble_y1 + 3,
+            fill=self.shadow_color,
+            outline=self.shadow_color,
+            tags="bubble"
+        )
+
+        self.canvas.create_rectangle(
+            bubble_x0, bubble_y0, bubble_x1, bubble_y1,
+            fill=fill,
+            outline=outline,
+            tags="bubble"
+        )
+
+        self.canvas.create_text(
+            bubble_x0 + 14,
+            bubble_y0 + 10,
+            text=text,
+            fill=text_color,
+            font=self.bubble_font,
+            width=max_width,
+            anchor="nw",
+            tags="bubble"
+        )
+        self.next_y = bubble_y1 + self.time_gap
+        if is_user:
+            time_x = bubble_x1
+            time_anchor = "ne"
+        else:
+            time_x = bubble_x0
+            time_anchor = "nw"
+        self.canvas.create_text(
+            time_x,
+            self.next_y,
+            text=message_time,
+            fill=TIME_COLOR,
+            font=self.time_font,
+            anchor=time_anchor,
+            tags="bubble"
+        )
+        self.next_y += 15
+        if show_chips and not is_user:
+            self.draw_followups(topic)
+        self.next_y += self.message_gap
+    # follow-up chips
+    def draw_followups(self, topic):
+        questions = FOLLOWUPS.get(topic, [])
+        if not questions:
+            return
+        chat_left, chat_right, chat_width = self.get_chat_area()
+        x = chat_left + self.side_margin
+        y = self.next_y
+        row_height = 27
+        gap = 7
+        for question in questions:
+            temp = self.canvas.create_text(
+                0,
+                0,
+                text=question,
+                font=self.chip_font,
+                anchor="nw"
+            )
+            box = self.canvas.bbox(temp)
+            chip_width = (
+                box[2] - box[0] if box else 50
+            ) + 22
+            self.canvas.delete(temp)
+            if (
+                x + chip_width > chat_right - self.side_margin
+                and x > chat_left + self.side_margin
+            ):
+                x = chat_left + self.side_margin
+                y += row_height + gap
+            self.canvas.create_rectangle(
+                x + 2, y + 2,
+                x + chip_width + 2, y + row_height + 2,
+                fill=self.shadow_color,
+                outline=self.shadow_color,
+                tags=("chip", "bubble")
+            )
+            chip = self.canvas.create_rectangle(
+                x, y, x + chip_width, y + row_height,
+                fill=CHIP_FILL,
+                outline=CHIP_BORDER,
+                tags=("chip", "bubble")
+            )
+            label = self.canvas.create_text(
+                x + chip_width / 2,
+                y + row_height / 2,
+                text=question,
+                fill=CHIP_TEXT,
+                font=self.chip_font,
+                anchor="center",
+                tags=("chip", "bubble")
+            )
+            self.canvas.tag_bind(
+                chip,
+                "<Button-1>",
+                lambda event, q=question: self.send_text(q)
+            )
+            self.canvas.tag_bind(
+                label,
+                "<Button-1>",
+                lambda event, q=question: self.send_text(q)
+            )
+            self.canvas.tag_bind(
+                chip,
+                "<Enter>",
+                lambda event: self.canvas.config(cursor="hand2")
+            )
+            self.canvas.tag_bind(
+                label,
+                "<Enter>",
+                lambda event: self.canvas.config(cursor="hand2")
+            )
+            self.canvas.tag_bind(
+                chip,
+                "<Leave>",
+                lambda event: self.canvas.config(cursor="")
+            )
+            self.canvas.tag_bind(
+                label,
+                "<Leave>",
+                lambda event: self.canvas.config(cursor="")
+            )
+            x += chip_width + gap
+        self.next_y = y + row_height + 5
+    # events
+    def send_text(self, text):
+        self.entry.delete(
+            0,
+            tk.END
+        )
+        self.entry.insert(
+            0,
+            text
+        )
+        self.handle_send()
+    def handle_send(self):
+        text = self.entry.get().strip()
+        if not text:
+            return
+        self.entry.delete(
+            0,
+            tk.END
+        )
+        self.add_message(
+            text,
+            "user",
+            None
+        )
+        response, topic, matches = infer_response(text)
+        self.add_message(
+            response,
+            "bot",
+            topic
+        )
+    # scroll
+    def update_scroll(self):
+        self.canvas.configure(
+            scrollregion=(
+                0,
+                0,
+                self.canvas_w,
+                self.next_y + 20
+            )
+        )
+        self.root.after(10, lambda: self.canvas.yview_moveto(1.0))
+if __name__ == "__main__":
+    root = tk.Tk()
+    ChatbotUI(root)
+    root.mainloop() 
